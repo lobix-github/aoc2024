@@ -91,6 +91,27 @@ abstract class baseD
         }
         return sum;
     }
+
+	protected string Reverse(string s)
+	{
+		char[] charArray = s.ToCharArray();
+		Array.Reverse(charArray);
+		return new string(charArray);
+	}
+
+	protected int[] AllIndexesOf(string str, string substr, bool ignoreCase = false)
+	{
+		int index = 0;
+		var indexes = new List<int>();
+		if (string.IsNullOrEmpty(str) || string.IsNullOrEmpty(substr)) return indexes.ToArray();
+
+		while ((index = str.IndexOf(substr, index, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)) != -1)
+		{
+			indexes.Add(index++);
+		}
+
+		return indexes.ToArray();
+	}
 }
 
 public class DCache<TKey, TValue>
