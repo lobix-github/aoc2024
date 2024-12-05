@@ -26,7 +26,8 @@
             line.Split(',').ToList().ForEach(x => h.Add(x.ToInt32()));
         }
 
-        var sum = 0;
+        var sum1 = 0;
+        var sum2 = 0;
         foreach (var update in updates)
         {
             var toCheck = new List<d05info>();
@@ -39,6 +40,8 @@
             }
 
             var ok = true;
+            var incorrects = new List<List<int>>();
+
             foreach (var val in update)
             {
                 if (toCheck.Any(x => x.value == val && !x.visited)) { ok = false; break; }
@@ -46,10 +49,35 @@
             }
             if (ok)
             {
-                sum += update[update.Count / 2];
+                // part 1
+                sum1 += update[update.Count / 2];
+            }
+            else
+            {
+                // part 2
+                bool again;
+                do
+                {
+                    again = false;
+                    foreach (var val in update)
+                    {
+                        var pair = toCheck.FirstOrDefault(x => x.value == val && !x.visited);
+                        if (pair != default) 
+                        {
+                            update[update.IndexOf(pair.key)] = pair.value;
+                            update[update.IndexOf(pair.value)] = pair.key;
+                            again = true;
+                            break;
+                        }
+                        toCheck.Where(x => x.key == val).ToList().ForEach(x => x.visited = true);
+                    }
+                } while(again);
+                sum2 += update[update.Count / 2];
             }
         }
-		Console.WriteLine(sum);
+
+        Console.WriteLine(sum1);
+        Console.WriteLine(sum2);
     }
 }
 
