@@ -7,10 +7,10 @@
 
         map = File.ReadAllLines(@"..\..\..\inputs\06.txt").Select(l => l.ToCharArray()).ToList();
 
-        d06Point cur = default;
+        d06Point cur = default, start = default;
         for (int y = 0; y < map.Count; y++)
             for (int x = 0; x < map[y].Length; x++)
-                if (map[y][x] == '^') cur = new d06Point(x, y, Dirs.N);
+                if (map[y][x] == '^') start = cur = new d06Point(x, y, Dirs.N);
 
         while (true)
         {
@@ -22,7 +22,34 @@
         // part 1
         Console.WriteLine(visited.Count);
 
-        bool isInMap(d06Point cur) => cur.Y >= 0 && cur.Y < map.Count && cur.X >= 0 && cur.Y < map[0].Length;
+        var visited2 = new HashSet<d06Point>();
+        var obstacles = 0;
+        for (int y = 0; y < map.Count; y++)
+        {
+            for (int x = 0; x < map[y].Length; x++)
+            {
+                var org = map[y][x];
+				map[y][x] = '#';
+                visited2.Clear();
+                cur = start;
+				while (true)
+				{
+                    if (visited2.Contains(cur))
+                    {
+                        obstacles++;
+                        break;
+                    }
+					visited2.Add(cur);
+					cur = move(cur);
+					if (!isInMap(cur)) break;
+				}
+				map[y][x] = org;
+			}
+		}
+        // part 2
+		Console.WriteLine(obstacles);
+
+		bool isInMap(d06Point cur) => cur.Y >= 0 && cur.Y < map.Count && cur.X >= 0 && cur.X < map[0].Length;
 
 		d06Point move(d06Point cur)
         {
