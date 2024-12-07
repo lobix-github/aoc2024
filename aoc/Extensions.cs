@@ -1,4 +1,6 @@
-﻿public static class DExts
+﻿using System.Numerics;
+
+public static class DExts
 {
     public static void AddReplace<T>(this List<T> list, T value, Predicate<T> match)
     {
@@ -18,4 +20,5 @@
 
     public static int ToInt32(this string value) => int.Parse(value);
     public static long ToInt64(this string value) => long.Parse(value);
+    public static BigInteger ToBigInt(this string value) => BigInteger.Parse(value);
 }
