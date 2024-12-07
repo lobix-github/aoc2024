@@ -17,4 +17,5 @@
     }
 
     public static int ToInt32(this string value) => int.Parse(value);
+    public static long ToInt64(this string value) => long.Parse(value);
 }
