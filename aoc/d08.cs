@@ -2,7 +2,8 @@
 {
     public void Run()
     {
-        var antinodes = new HashSet<DPoint>();
+        var antinodes1 = new HashSet<DPoint>();
+        var antinodes2 = new HashSet<DPoint>();
         var antennas = new Dictionary<char, List<DPoint>>();
 
         var map = File.ReadLines(@"..\..\..\inputs\08.txt").Select(l => l.ToCharArray()).ToList();
@@ -27,18 +28,71 @@
                 var rest = antennaType.Value.Except([antenna]);
                 foreach (var anotherAntenna in rest)
                 {
-                    foreach (var antinode in calcAntinodes(antenna, anotherAntenna))
+                    foreach (var antinode in calcAntinodes1(antenna, anotherAntenna))
                     {
-                        antinodes.Add(antinode);
+                        antinodes1.Add(antinode);
+                    }
+                    foreach (var antinode in calcAntinodes2(antenna, anotherAntenna))
+                    {
+                        antinodes2.Add(antinode);
                     }
                 }
             }
         }
 
-        var result = antinodes.Count;
+        var result = antinodes1.Count;
+        Console.WriteLine(result);
+        result = antinodes2.Count;
         Console.WriteLine(result);
 
-        IEnumerable<DPoint> calcAntinodes(DPoint a1, DPoint a2)
+        IEnumerable<DPoint> calcAntinodes2(DPoint a1, DPoint a2)
+        {
+            if (!(a1.Y < a2.Y))
+            {
+                var temp = a1.Copy();
+                a1 = a2.Copy();
+                a2 = temp.Copy();
+            }
+
+            var deltaX = Math.Abs(a1.X - a2.X);
+            var deltaY = Math.Abs(a1.Y - a2.Y);
+
+            // we know a1.Y < a2.Y
+            if (a1.X < a2.X)
+            {
+                var p = a1.Copy();
+                do
+                {
+                    yield return p;
+                    p = new DPoint(p.X - deltaX, p.Y - deltaY);
+                } while (isInMap(p));
+
+                p = a2.Copy();
+                do
+                {
+                    yield return p;
+                    p = new DPoint(p.X + deltaX, p.Y + deltaY);
+                } while (isInMap(p));
+            }
+            else
+            {
+                var p = a1.Copy();
+                do
+                {
+                    yield return p;
+                    p = new DPoint(p.X + deltaX, p.Y - deltaY);
+                } while (isInMap(p));
+
+                p = a2.Copy();
+                do
+                {
+                    yield return p;
+                    p = new DPoint(p.X - deltaX,p.Y + deltaY);
+                } while (isInMap(p));
+            }
+        }
+
+        IEnumerable<DPoint> calcAntinodes1(DPoint a1, DPoint a2)
         {
             var deltaX = Math.Abs(a1.X - a2.X);
             var minX = Math.Min(a1.X, a2.X) - deltaX;
