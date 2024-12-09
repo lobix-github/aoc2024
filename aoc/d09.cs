@@ -4,6 +4,7 @@
     {
         var input = File.ReadAllText(@"..\..\..\inputs\09.txt");
         var list = new List<infoD09>();
+        var list2 = new List<infoD09>();
         var empties = new List<int>();
         var blocks = new List<infoD09>();
         var emptyBlocks = new List<infoD09>();
@@ -17,8 +18,9 @@
             {
 				if (i % 2 == 0)
 				{
-					var info = new infoD09(id, idx, c - '0', false);
+					var info = new infoD09(id, idx, c - '0');
 					list.Add(info);
+					list2.Add(info);
 					if (j == 0)
 					{
 						blocks.Add(info);
@@ -26,9 +28,10 @@
 				}
 				else
                 {
-					var info = new infoD09(-1, idx, c - '0', false);
+					var info = new infoD09(-1, idx, c - '0');
 
 					list.Add(info);
+					list2.Add(info);
                     empties.Add(idx);
 					if (j == 0)
 					{
@@ -44,21 +47,27 @@
 		}
 
 		part1();
-		part2();
+		Console.WriteLine(getSum());
 
-		long sum = 0;
-        for (int i = 0; i < list.Count; i++)
-        {
-			var val = list[i].id;
-			if (val != -1)
-            {
-				sum += i * val;
+		list = list2;
+		part2();
+		Console.WriteLine(getSum());
+
+		long getSum()
+		{
+			long sum = 0;
+			for (int i = 0; i < list.Count; i++)
+			{
+				var val = list[i].id;
+				if (val != -1)
+				{
+					sum += i * val;
+				}
 			}
+			return sum;
 		}
 
-		Console.WriteLine(sum);
-
-        void part1()
+		void part1()
         {
 			while (empties.Any())
 			{
@@ -104,5 +113,5 @@
 		}
 	}
 
-	record infoD09(int id, int idx, int len, bool moved);
+	record infoD09(int id, int idx, int len);
 }
