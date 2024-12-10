@@ -1,6 +1,4 @@
-﻿using static System.Net.Mime.MediaTypeNames;
-
-class d10
+﻿class d10
 {
     public void Run()
     {
@@ -19,6 +17,7 @@ class d10
 					q.Enqueue(trailhead);
 				}
 
+		var sum = 0;
 		while (q.Any())
 		{
 			var cur = q.Dequeue();
@@ -31,7 +30,7 @@ class d10
 
 			if (cur.height == 9)
 			{
-				cur.score.Add(cur);
+				sum++;
 				continue;
 			}
 
@@ -49,7 +48,6 @@ class d10
 			}
 		}
 
-		var sum = trailheads.Select(x => x.score.Count).Sum();
 		Console.WriteLine(sum);
 
 		bool isInMap(infoD10 p) => p.y >= 0 && p.y < map.Count && p.x >= 0 && p.x < map[0].Length;
@@ -57,6 +55,8 @@ class d10
 
 	class infoD10
 	{
+		private static readonly bool PART1 = true;
+
 		public infoD10(int x, int y)
 		{
 			this.x = x; 
@@ -64,13 +64,12 @@ class d10
 		}
 
 		public HashSet<infoD10> visited = new();
-		public HashSet<infoD10> score = new();
 		public int len = 0;
 		public int height = 0;
 		public int x;
 		public int y;
 
-		public infoD10 GetNext(int x, int y) => new infoD10(x, y) { len = len + 1, height = height + 1, visited = visited, score = score };
+		public infoD10 GetNext(int x, int y) => new infoD10(x, y) { len = len + 1, height = height + 1, visited = PART1 ? visited : visited.ToHashSet() };
 
 		public override int GetHashCode() => $"x: {x}, y: {y}".GetHashCode();
 
