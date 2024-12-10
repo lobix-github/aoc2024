@@ -2,20 +2,13 @@
 {
     public void Run()
     {
-		var trailheads = new HashSet<infoD10>();
-
 		var map = new List<char[]>();
         map = File.ReadAllLines(@"..\..\..\inputs\10.txt").Select(l => l.ToCharArray()).ToList();
 
 		var q = new Queue<infoD10>();
 		for (int y = 0; y < map.Count; y++)
 			for (int x = 0; x < map[y].Length; x++)
-				if (map[y][x] == '0')
-				{
-					var trailhead = new infoD10(x, y);
-					trailheads.Add(trailhead);
-					q.Enqueue(trailhead);
-				}
+				if (map[y][x] == '0') q.Enqueue(new infoD10(x, y));
 
 		var sum = 0;
 		while (q.Any())
@@ -64,12 +57,11 @@
 		}
 
 		public HashSet<infoD10> visited = new();
-		public int len = 0;
 		public int height = 0;
 		public int x;
 		public int y;
 
-		public infoD10 GetNext(int x, int y) => new infoD10(x, y) { len = len + 1, height = height + 1, visited = PART1 ? visited : visited.ToHashSet() };
+		public infoD10 GetNext(int x, int y) => new infoD10(x, y) { height = height + 1, visited = PART1 ? visited : visited.ToHashSet() };
 
 		public override int GetHashCode() => $"x: {x}, y: {y}".GetHashCode();
 
