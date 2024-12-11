@@ -1,34 +1,36 @@
-﻿using System.Numerics;
-
-class d11
+﻿class d11
 {
 	public void Run()
 	{
 		var list = new List<long>();
 		list = File.ReadAllText(@"..\..\..\inputs\11.txt").Split(' ').Select(x => x.ToInt64()).ToList();
-		
-		var list2 = new List<long>();
-		for (int idx = 0; idx < 25; idx++)
-		{
-			var count = list.Count;
-			for (int i = 0; i < count; i++)
-			{
-				if (i % 10000000 == 0) Console.WriteLine($"idx: {idx}, i: {i}/{count} ({(long)i * 100 / count}%)");
 
-				var stone = list[i];
-				if (stone == 0) list2.Add(1);
-				else if (stone.ToString() is string stoneString && stoneString.Length % 2 == 0)
-				{
-					var halfLen = stoneString.Length / 2;
-					list2.Add(stoneString.Substring(0, halfLen).ToInt64());
-					list2.Add(stoneString.Substring(halfLen, halfLen).ToInt64());
-				}
-				else list2.Add(stone * 2024);
-			}
-			list = list2.ToList();
-			list2.Clear();
+		var cache = new Dictionary<long, long>();
+		foreach (var item in list) cache[item] = 1;
+		for (int idx = 0; idx < 75; idx++)
+		{
+			foreach (var (key, value) in cache.ToList())
+			{
+				cache[key] -= value;
+
+                if (key == 0) addCreate(1, value);
+                else if (key.ToString() is string stoneString && stoneString.Length % 2 == 0)
+                {
+                    var halfLen = stoneString.Length / 2;
+					addCreate(stoneString.Substring(0, halfLen).ToInt64(), value);
+					addCreate(stoneString.Substring(halfLen, halfLen).ToInt64(), value);
+                }
+                else addCreate(key * 2024, value);
+            }
+        }
+
+		void addCreate(long k, long v)
+		{
+			cache.TryAdd(k, 0);
+			cache[k] += v;
 		}
 
-		Console.WriteLine(list.Count);
+		var sum = cache.Values.Sum();
+        Console.WriteLine(sum);
 	}
 }
