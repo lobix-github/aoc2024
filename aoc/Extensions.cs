@@ -18,6 +18,9 @@ public static class DExts
             list.RemoveAt(pos);
     }
 
+    public static bool isInMap(this List<char[]>map, MarkPoint p) => p.Y >= 0 && p.Y < map.Count && p.X >= 0 && p.X < map[0].Length;
+
+
     public static int ToInt32(this string value) => int.Parse(value);
     public static long ToInt64(this string value) => long.Parse(value);
     public static BigInteger ToBigInt(this string value) => BigInteger.Parse(value);

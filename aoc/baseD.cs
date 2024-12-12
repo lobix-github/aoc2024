@@ -9,7 +9,7 @@ abstract class baseD
     protected long ToLong(string val) => Convert.ToInt64(val);
     protected BigInteger ToBigInt(string val) => BigInteger.Parse(val);
 
-    protected List<string> rotate(List<string> list)
+    protected static List<string> rotate(List<string> list)
     {
         var result = new List<string>(list[0].Length);
         result.AddRange(Enumerable.Repeat(string.Empty, list[0].Length));
@@ -25,7 +25,7 @@ abstract class baseD
         return result;
     }
 
-    protected void loopCycle<T>(int count, Func<int, T> jobReturningCacheKey)
+    protected static void loopCycle<T>(int count, Func<int, T> jobReturningCacheKey)
     {
         var cache = new Dictionary<T, int>();
         var cycle = 1;
@@ -46,7 +46,7 @@ abstract class baseD
         }
     }
 
-    protected long calculateInners(HashSet<Point> plain)
+    protected static long calculateInners(HashSet<Point> plain)
     {
         var minX = plain.Select(x => x.X).Min();
         var minY = plain.Select(x => x.Y).Min();
@@ -93,7 +93,154 @@ abstract class baseD
         return sum;
     }
 
-	protected string Reverse(string s)
+    protected static IEnumerable<DPoint> GetNumberOfCorners(IEnumerable<MarkPoint> region)
+    {
+        // number of edges is equal to number of corners
+        foreach (var item in GetNumberOfEdges(region))
+        {
+            yield return item;
+        }
+    }
+
+    protected static IEnumerable<DPoint> GetNumberOfEdges(IEnumerable<MarkPoint> region)
+    {
+            foreach (var p in region.ToList())
+			{
+                var lu = new MarkPoint(p.X - 1, p.Y - 1, '.');
+                var u = new MarkPoint(p.X, p.Y - 1, '.');
+                var ru = new MarkPoint(p.X + 1, p.Y - 1, '.');
+                var r = new MarkPoint(p.X + 1, p.Y, '.');
+                var rb = new MarkPoint(p.X + 1, p.Y + 1, '.');
+                var b = new MarkPoint(p.X, p.Y + 1, '.');
+                var lb = new MarkPoint(p.X - 1, p.Y + 1, '.');
+                var l = new MarkPoint(p.X - 1, p.Y, '.');
+
+                if (!region.Contains(l) && !region.Contains(u))
+                {
+                    yield return new DPoint(p.X, p.Y);
+                }
+                if (region.Contains(l) && region.Contains(u) && !region.Contains(lu))
+                {
+                yield return new DPoint(p.X, p.Y);
+                }
+
+                if (!region.Contains(u) && !region.Contains(r))
+                {
+                yield return new DPoint(p.X + 1, p.Y);
+                }
+                if (region.Contains(u) && region.Contains(r) && !region.Contains(ru))
+                {
+                    yield return new DPoint(p.X + 1, p.Y);
+                }
+
+                if (!region.Contains(r) && !region.Contains(b))
+                {
+                    yield return new DPoint(p.X + 1, p.Y + 1);
+                }
+                if (region.Contains(r) && region.Contains(b) && !region.Contains(rb))
+                {
+                    yield return new DPoint(p.X + 1, p.Y + 1);
+                }
+
+                if (!region.Contains(b) && !region.Contains(l))
+                {
+                    yield return new DPoint(p.X, p.Y + 1);
+                }
+                if (region.Contains(b) && region.Contains(l) && !region.Contains(lb))
+                {
+                    yield return new DPoint(p.X, p.Y + 1);
+                }
+            }
+    }
+
+    protected static int TotalLengthOgEdges(IEnumerable<MarkPoint> region, IList<char[]> map)
+    {
+        var perimiteres = 0;
+        var minY = region.Select(x => x.Y).Min();
+        var maxY = region.Select(x => x.Y).Max();
+        for (int y = minY; y <= maxY; y++)
+        {
+            foreach (var p in region.Where(p => p.Y == y).OrderBy(p => p.X).Select(p => p))
+            {
+                var xs = region.Where(x => x.X == p.X);
+                if (!sameX(p))
+                {
+                    perimiteres += 2;
+                }
+            }
+        }
+
+        var minX = region.Select(x => x.X).Min();
+        var maxX = region.Select(x => x.X).Max();
+        for (int x = minX; x <= maxX; x++)
+        {
+            foreach (var p in region.Where(p => p.X == x).OrderBy(p => p.Y).Select(p => p))
+            {
+                var ys = region.Where(x => x.Y == p.Y);
+                if (!sameY(p))
+                {
+                    perimiteres += 2;
+                }
+            }
+        }
+
+        return perimiteres;
+
+        bool sameX(MarkPoint p) => p.X - 1 >= 0 && map[p.Y][p.X - 1] == p.marker;
+        bool sameY(MarkPoint p) => p.Y - 1 >= 0 && map[p.Y - 1][p.X] == p.marker;
+    }
+
+
+    protected static List<MarkPoint> ReadRegions(List<char[]> map)
+    {
+		List<MarkPoint> regions = new();
+
+        for (int y = 0; y < map.Count; y++)
+        {
+            for (int x = 0; x < map[y].Length; x++)
+            {
+                var point = new MarkPoint(x, y, map[y][x]);
+                if (!regions.SelectMany(x => x.visited).Contains(point))
+                {
+                    regions.Add(point);
+                    crowl(map, point);
+                }
+            }
+        }
+
+        return regions;
+    }
+
+    static void crowl(List<char[]> map, MarkPoint point)
+    {
+        var q = new Queue<MarkPoint>();
+        q.Enqueue(point);
+        while (q.Any())
+        {
+            var cur = q.Dequeue();
+
+            if (cur.visited.Contains(cur))
+            {
+                continue;
+            }
+            cur.visited.Add(cur);
+
+            TryQueue(cur.GetNext(cur.X - 1, cur.Y));
+            TryQueue(cur.GetNext(cur.X + 1, cur.Y));
+            TryQueue(cur.GetNext(cur.X, cur.Y - 1));
+            TryQueue(cur.GetNext(cur.X, cur.Y + 1));
+
+            void TryQueue(MarkPoint next)
+            {
+                if (map.isInMap(next) && map[next.Y][next.X] == cur.marker)
+                {
+                    q.Enqueue(next);
+                }
+            }
+        }
+    }
+
+    protected string Reverse(string s)
 	{
 		char[] charArray = s.ToCharArray();
 		Array.Reverse(charArray);
@@ -166,18 +313,18 @@ public enum Dirs
     W = 3
 }
 
-class CPoint
+public class CPoint
 {
-    public readonly int x;
-    public readonly int y;
+    public readonly int X;
+    public readonly int Y;
 
     public CPoint(int x, int y)
     {
-        this.x = x;
-        this.y = y;
+        this.X = x;
+        this.Y = y;
     }
 
-    public virtual string id => $"x: {x}, y: {y}";
+    public virtual string id => $"x: {X}, y: {Y}";
 
     public override int GetHashCode() => id.GetHashCode();
 
@@ -188,6 +335,8 @@ class CPoint
 
 public record DPoint(int X, int Y) : ICopy<DPoint>
 {
+    public virtual string id => $"x: {X}, y: {Y}";
+
     public DPoint Copy() => new DPoint(X, Y);
 }
 
@@ -212,3 +361,20 @@ public interface ICopy<T>
 {
     T Copy();
 }
+
+public class MarkPoint : CPoint
+{
+    public HashSet<MarkPoint> visited = new();
+    public char marker;
+
+    public MarkPoint(int X, int Y, char marker) : base(X, Y)
+    {
+        this.marker = marker;
+    }
+
+    public List<DPoint> edgeCorners = new();
+
+    public MarkPoint GetNext(int x, int y) => new MarkPoint(x, y, marker) { visited = visited };
+
+    public override string ToString() => $"{id}, plant: {marker}, sum: {visited.Count}";
+};
