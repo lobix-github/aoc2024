@@ -9,7 +9,7 @@ abstract class baseD
     protected long ToLong(string val) => Convert.ToInt64(val);
     protected BigInteger ToBigInt(string val) => BigInteger.Parse(val);
 
-    protected static List<string> rotate(List<string> list)
+    protected List<string> rotate(List<string> list)
     {
         var result = new List<string>(list[0].Length);
         result.AddRange(Enumerable.Repeat(string.Empty, list[0].Length));
@@ -25,7 +25,7 @@ abstract class baseD
         return result;
     }
 
-    protected static void loopCycle<T>(int count, Func<int, T> jobReturningCacheKey)
+    protected void loopCycle<T>(int count, Func<int, T> jobReturningCacheKey)
     {
         var cache = new Dictionary<T, int>();
         var cycle = 1;
@@ -153,7 +153,7 @@ abstract class baseD
             }
     }
 
-    protected static int TotalLengthOgEdges(IEnumerable<MarkPoint> region, IList<char[]> map)
+    protected static int TotalLengthOgEdges(List<char[]> map, IEnumerable<MarkPoint> region)
     {
         var perimiteres = 0;
         var minY = region.Select(x => x.Y).Min();
@@ -190,11 +190,10 @@ abstract class baseD
         bool sameY(MarkPoint p) => p.Y - 1 >= 0 && map[p.Y - 1][p.X] == p.marker;
     }
 
-
-    protected static List<MarkPoint> ReadRegions(List<char[]> map)
+    static protected IEnumerable<MarkPoint> ParseRegions(List<char[]> map)
     {
 		List<MarkPoint> regions = new();
-
+        
         for (int y = 0; y < map.Count; y++)
         {
             for (int x = 0; x < map[y].Length; x++)
@@ -211,7 +210,7 @@ abstract class baseD
         return regions;
     }
 
-    static void crowl(List<char[]> map, MarkPoint point)
+    private static void crowl(List<char[]> map, MarkPoint point)
     {
         var q = new Queue<MarkPoint>();
         q.Enqueue(point);

@@ -2,15 +2,15 @@
 {
 	public void Run()
 	{
-		var map = File.ReadAllLines(@"..\..\..\inputs\12.txt").Select(l => l.ToCharArray()).ToList();
+        var map = File.ReadAllLines(@"..\..\..\inputs\12.txt").Select(l => l.ToCharArray()).ToList();
 
-        var regions = ReadRegions(map);
+        var regions = ParseRegions(map);
 
 		var sum = 0;
         var sum2 = 0;
         foreach (var region in regions)
 		{
-			var perimiteres = TotalLengthOgEdges(region.visited, map);
+			var perimiteres = TotalLengthOgEdges(map, region.visited);
 
 			sum += perimiteres * region.visited.Count;
 
