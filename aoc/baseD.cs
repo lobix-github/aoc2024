@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.ComponentModel;
+using System.Drawing;
 using System.Numerics;
 
 abstract class baseD
@@ -163,6 +164,26 @@ public enum Dirs
     E = 1,
     S = 2,
     W = 3
+}
+
+class CPoint
+{
+    public readonly int x;
+    public readonly int y;
+
+    public CPoint(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
+    public virtual string id => $"x: {x}, y: {y}";
+
+    public override int GetHashCode() => id.GetHashCode();
+
+    public override bool Equals(object obj) => obj is CPoint other && other.GetHashCode() == this.GetHashCode();
+
+    public override string ToString() => $"{id}";
 }
 
 public record DPoint(int X, int Y) : ICopy<DPoint>
