@@ -25,7 +25,7 @@ abstract class baseD
         return result;
     }
 
-    protected void loopCycle<T>(int count, Func<int, T> jobReturningCacheKey)
+    public static void loopCycle<T>(int count, Func<int, T> jobReturningCacheKey)
     {
         var cache = new Dictionary<T, int>();
         var cycle = 1;
@@ -319,8 +319,8 @@ public class CPoint
 
     public CPoint(int x, int y)
     {
-        this.X = x;
-        this.Y = y;
+        X = x;
+        Y = y;
     }
 
     public virtual string id => $"x: {X}, y: {Y}";
