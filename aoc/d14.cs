@@ -6,7 +6,7 @@
 	public void Run()
 	{
         var robots = new List<Robot>();
-        var lines = File.ReadAllLines(@"..\..\..\inputs\13.txt");
+        var lines = File.ReadAllLines(@"..\..\..\inputs\14.txt");
         for (int i = 0; i < lines.Length; i++)
         {
             var line = lines[i];
@@ -35,6 +35,26 @@
         var sum = q1 * q2 * q3 * q4;
 
         Console.WriteLine(sum);
+
+        var seconds = 0;
+        while (true)
+        {
+            seconds++;
+            var plain = new List<char[]>();
+            for (var y = 0; y < HEIGHT; y++) plain.Add(new char[WIDTH]);
+            foreach (var robot in robots)
+            {
+                var coords = robot.Move2(seconds);
+                plain[coords.Y][coords.X] = 'X';
+            }
+
+            if (plain.SelectMany(x => x).Where(x => x == 'X').Count() == robots.Count)
+            {
+                // fuckin' lucky guess that they all will be needed. no idea how to otherwise
+                break;
+            }
+        }
+        Console.WriteLine(seconds);
     }
 
     class Robot : CPoint
@@ -64,6 +84,13 @@
             });
 
             return new Robot(cur.X, cur.Y, moveX, moveY, _id);
+        }
+
+        public CPoint Move2(int seconds)
+        {
+            var newX = (X + moveX * seconds + WIDTH * seconds) % WIDTH;
+            var newY = (Y + moveY * seconds + HEIGHT * seconds) % HEIGHT;
+            return new Robot(newX, newY, moveX, moveY, _id);
         }
     };
 }
