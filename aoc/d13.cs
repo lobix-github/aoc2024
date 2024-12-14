@@ -1,70 +1,41 @@
 ﻿class d13 : baseD
 {
-    const int WIDTH = 101;
-    const int HEIGHT = 103;
-
 	public void Run()
 	{
-        var robots = new List<Robot>();
-        var lines = File.ReadAllLines(@"..\..\..\inputs\13.txt");
-        for (int i = 0; i < lines.Length; i++)
+		//var extra = 0L;
+		var extra = 10000000000000L;
+
+		var lines = File.ReadAllLines(@"..\..\..\inputs\13.txt").ToList();
+
+		var sum = 0L;
+		for (int i = 0; i < lines.Count; i++)
         {
-            var line = lines[i];
-            var parts = line.Split(' ');
-            var coords = parts[0].Split('=')[1];
-            var coordX = coords.Split(',')[0].ToInt32();
-            var coordY = coords.Split(',')[1].ToInt32();
-            var v = parts[1].Split('=')[1];
-            var vX = v.Split(',')[0].ToInt32();
-            var vY = v.Split(',')[1].ToInt32();
+            var parts = lines[i].Split(' ');
+            var ax = parts[2].Split('+')[1].TrimEnd(',').ToInt64();
+            var ay = parts[3].Split('+')[1].ToInt64();
 
-            var robot = new Robot(coordX, coordY, vX, vY, i);
-            robots.Add(robot);
-        }
+			parts = lines[i + 1].Split(' ');
+			var bx = parts[2].Split('+')[1].TrimEnd(',').ToInt64();
+			var by = parts[3].Split('+')[1].ToInt64();
 
-        var result = new List<Robot>();
-        foreach (var robot in robots)
-        {
-            result.Add(robot.Move(100));
-        }
-        var q1 = result.Where(r => r.X < WIDTH / 2 && r.Y < HEIGHT / 2).Count();
-        var q2 = result.Where(r => r.X > WIDTH / 2 && r.Y < HEIGHT / 2).Count();
-        var q3 = result.Where(r => r.X < WIDTH / 2 && r.Y > HEIGHT / 2).Count();
-        var q4 = result.Where(r => r.X > WIDTH / 2 && r.Y > HEIGHT / 2).Count();
+			parts = lines[i + 2].Split(' ');
+			var x = parts[1].Split('=')[1].TrimEnd(',').ToInt64() + extra;
+			var y = parts[2].Split('=')[1].ToInt64() + extra;
 
-        var sum = q1 * q2 * q3 * q4;
+			i += 3;
 
-        Console.WriteLine(sum);
-    }
+			long idxB = (ax * y - ay * x) / (ax * by - ay * bx);
+			long t1 = (ax * y - ay * x) % (ax * by - ay * bx);
+			long idxA = (y - by * idxB) / ay;
+			long t2 = (y - by * idxB) % ay;
 
-    class Robot : CPoint
-    {
-        private readonly int moveX;
-        private readonly int moveY;
-        public int _id;
+			if (t1 == 0 && t2 == 0)
+			{
+				sum += idxA * 3 + idxB;
+			}
+		}
 
-        public Robot(int X, int Y, int moveX, int moveY, int id) : base(X, Y)
-        {
-            this.moveX = moveX;
-            this.moveY = moveY;
-            _id = id;
-        }
-
-        public override string id => $"{base.id}, id: {_id}";
-
-        public Robot Move(int seconds)
-        {
-            var cur = new CPoint(X, Y);
-            loopCycle(seconds, i =>
-            {
-                var newX = (X + moveX * i + WIDTH * i) % WIDTH;
-                var newY = (Y + moveY * i + HEIGHT * i) % HEIGHT;
-                cur = new CPoint(newX, newY);
-                return cur;
-            });
-
-            return new Robot(cur.X, cur.Y, moveX, moveY, _id);
-        }
-    };
+		Console.WriteLine(sum);
+	}
 }
 
