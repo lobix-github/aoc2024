@@ -1,6 +1,51 @@
-﻿class d15 : baseD
+﻿using System.Collections.Immutable;
+using System.Numerics;
+
+using Map = System.Collections.Immutable.IImmutableDictionary<System.Numerics.Complex, char>;
+
+class d15 : baseD
 {
-	public void Run()
+    //static Complex Up = -Complex.ImaginaryOne;
+    //static Complex Down = Complex.ImaginaryOne;
+    //static Complex Left = -1;
+    //static Complex Right = 1;
+
+    //public void Solve(string input)
+    //{
+    //    var (map, steps) = Parse(input);
+    //    var robot = map.Keys.Single(k => map[k] == '@');
+    //    foreach (var dir in steps)
+    //    {
+    //        if (map[robot] == 'X')
+    //        {
+    //            robot += dir;
+    //        }
+    //    }
+    //}
+
+    //(Map, Complex[]) Parse(string input)
+    //{
+    //    var blocks = input.Split("\n\n");
+    //    var lines = blocks[0].Split("\n");
+    //    var map = (
+    //        from y in Enumerable.Range(0, lines.Length)
+    //        from x in Enumerable.Range(0, lines[0].Length)
+    //        select new KeyValuePair<Complex, char>(x + y * Down, lines[y][x])
+    //    ).ToImmutableDictionary();
+
+    //    var steps = blocks[1].ReplaceLineEndings("").Select(ch =>
+    //        ch switch {
+    //            '^' => Up,
+    //            '<' => Left,
+    //            '>' => Right,
+    //            'v' => Down,
+    //            _ => throw new Exception()
+    //        });
+
+    //    return (map, steps.ToArray());
+    //}
+
+    public void Run()
 	{
         var boxes = new HashSet<box2>();
         var wall = new HashSet<box2>();
