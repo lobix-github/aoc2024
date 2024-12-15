@@ -2,9 +2,9 @@
 {
 	public void Run()
 	{
-        var boxes = new HashSet<CPoint>();
-        var wall = new HashSet<CPoint>();
-        CPoint cur = default;
+        var boxes = new HashSet<box2>();
+        var wall = new HashSet<box2>();
+        box2 cur = default;
         var lines = File.ReadAllLines(@"..\..\..\inputs\15.txt");
         var moves = string.Empty;
         var map = new List<char[]>();
@@ -22,9 +22,9 @@
                 map.Add(line.ToCharArray());
                 for (int j = 0; j < line.Length; j++)
                 {
-                    if (line[j] == 'O') boxes.Add(new CPoint(j, i));
-                    if (line[j] == '#') wall.Add(new CPoint(j, i));
-                    if (line[j] == '@') cur = new CPoint(j, i);
+                    if (line[j] == 'O') boxes.Add(new box2(j * 2, i) { right = new CPoint(j * 2 + 1, i) });
+                    if (line[j] == '#') wall.Add(new box2(j * 2, i) { right = new CPoint(j * 2 + 1, i) });
+                    if (line[j] == '@') cur = new box2(j * 2, i) { right = new CPoint(j * 2, i) };
                 }
             }
             else
@@ -37,21 +37,22 @@
         {
             var move = moves[i];
             var newCur = getNext(move);
-            if (wall.Contains(newCur)) continue;
-            if (!boxes.Contains(newCur))
+            var maybBox = boxes.Where(b => b.Equals(newCur)).FirstOrDefault();
+            if (wall.Any(x => x.Equals(newCur)) || (maybBox != default && wall.Any(x => x.Equals(maybBox)))) continue;
+            if (!boxes.Any(x => x.Equals(newCur)))
             {
                 cur = newCur;
                 continue;
             }
 
             //we have a box
-            cur = tryMoveBoxes(newCur, move);
+            cur = tryMoveBoxes(newCur, move) ?? cur;
         }
 
         var sum = boxes.Aggregate(0, (acc, p) => acc += p.X + 100 * p.Y);
         Console.WriteLine(sum);
 
-        CPoint tryMoveBoxes(CPoint p, char move)
+        box2 tryMoveBoxes(box2 p, char move)
         {
             var delta = move switch
             {
@@ -61,28 +62,80 @@
                 'v' => new CPoint(0, 1),
             };
 
-            var newP = new CPoint(p.X, p.Y);
+            if (delta.X != 0) return moveH(p, delta.X);
+
+            var movingBoxes = boxes.Where(x => x.Equals(p)).ToHashSet();
+            var boxesToMove = new HashSet<box2>(movingBoxes);
             while (true)
             {
-                newP = new CPoint(newP.X + delta.X, newP.Y + delta.Y);
-                if (wall.Contains(newP)) break;
-                if (boxes.Contains(newP)) continue; 
+                movingBoxes = movingBoxes.Select(b => new box2(b.X, b.Y + delta.Y) { right = new CPoint(b.right.X, b.Y + delta.Y) }).ToHashSet();
+                if (wall.Any(w => movingBoxes.Any(x => x.Equals(w)))) return null; 
+                foreach (var b in movingBoxes)
+                {
+                    boxesToMove.Add(new box2(b.X, b.Y - delta.Y) { right = new CPoint(b.right.X, b.Y - delta.Y) });
+                }
+
+                movingBoxes = boxes.Where(b => movingBoxes.Any(x => x.Equals(b))).ToHashSet();
+                if (!movingBoxes.Any()) break;
+            }
+
+            foreach (var boxToMove in boxesToMove)
+            {
+                boxes.Remove(boxToMove);
+            }
+            foreach (var boxToMove in boxesToMove)
+            {
+                boxes.Add(new box2(boxToMove.X, boxToMove.Y + delta.Y) { right = new CPoint(boxToMove.right.X, boxToMove.right.Y + delta.Y) });
+            }
+            return p;
+        }
+
+        box2 moveH(box2 p, int deltaX)
+        {
+            var boxesToMove = new HashSet<box2>();
+            var newP = new box2(p.X, p.Y);
+            while (true)
+            {
+                newP = new box2(newP.X + deltaX, p.Y);
+                if (wall.Any(x => x.Equals(newP))) break;
+                if (boxes.Any(x => x.Equals(newP)))
+                {
+                    boxesToMove.Add(boxes.First(x => x.Equals(newP)));
+                    continue;
+                };
                 //free space
-                boxes.Remove(p);
-                boxes.Add(newP);
+                foreach (var box in boxesToMove)
+                {
+                    boxes.Remove(box);
+                    boxes.Add(new box2(box.X + deltaX, p.Y) { right = new CPoint(box.right.X + deltaX, p.Y) } );
+                }
                 return p;
             }
 
-            return new CPoint(p.X - delta.X, p.Y - delta.Y); ;
+            return null;
         }
 
-        CPoint getNext(char move) => move switch
+        box2 getNext(char move) => move switch
         {
-            '>' => new CPoint(cur.X + 1, cur.Y),
-            '<' => new CPoint(cur.X - 1, cur.Y),
-            '^' => new CPoint(cur.X, cur.Y - 1),
-            'v' => new CPoint(cur.X, cur.Y + 1),
+            '>' => new box2(cur.X + 1, cur.Y) { right = new CPoint(cur.X + 1, cur.Y) },
+            '<' => new box2(cur.X - 1, cur.Y) { right = new CPoint(cur.X - 1, cur.Y) },
+            '^' => new box2(cur.X, cur.Y - 1) { right = new CPoint(cur.X, cur.Y - 1) },
+            'v' => new box2(cur.X, cur.Y + 1) { right = new CPoint(cur.X, cur.Y + 1) },
         };
+    }
+
+    class box2 : CPoint
+    {
+        public CPoint right;
+
+        public box2(int X, int Y) : base(X, Y) { }
+
+        public CPoint other(int x) => X == x ? right : this;
+
+        public override bool Equals(object obj) 
+            => obj is box2 other
+                && (other.X == X || other.X == right.X || other.right?.X == X || other.right?.X == right.X)
+                && (other.Y == Y || other.Y == right.Y || other.right?.Y == Y || other.right?.Y == right.Y);
     }
 }
 
