@@ -1,9 +1,13 @@
-﻿using System.ComponentModel;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Numerics;
 
 abstract class baseD
 {
+    protected static Complex Up = -Complex.ImaginaryOne;
+    protected static Complex Down = Complex.ImaginaryOne;
+    protected static Complex Left = -1;
+	protected static Complex Right = 1;
+
     protected int ToInt(string val) => Convert.ToInt32(val);
     protected int ToIntFromHex(string val) => Convert.ToInt32(val, 16);
     protected long ToLong(string val) => Convert.ToInt64(val);
@@ -104,53 +108,53 @@ abstract class baseD
 
     protected static IEnumerable<DPoint> GetNumberOfEdges(IEnumerable<MarkPoint> region)
     {
-            foreach (var p in region.ToList())
-			{
-                var lu = new MarkPoint(p.X - 1, p.Y - 1, '.');
-                var u = new MarkPoint(p.X, p.Y - 1, '.');
-                var ru = new MarkPoint(p.X + 1, p.Y - 1, '.');
-                var r = new MarkPoint(p.X + 1, p.Y, '.');
-                var rb = new MarkPoint(p.X + 1, p.Y + 1, '.');
-                var b = new MarkPoint(p.X, p.Y + 1, '.');
-                var lb = new MarkPoint(p.X - 1, p.Y + 1, '.');
-                var l = new MarkPoint(p.X - 1, p.Y, '.');
+        foreach (var p in region.ToList())
+		{
+            var lu = new MarkPoint(p.X - 1, p.Y - 1, '.');
+            var u = new MarkPoint(p.X, p.Y - 1, '.');
+            var ru = new MarkPoint(p.X + 1, p.Y - 1, '.');
+            var r = new MarkPoint(p.X + 1, p.Y, '.');
+            var rb = new MarkPoint(p.X + 1, p.Y + 1, '.');
+            var b = new MarkPoint(p.X, p.Y + 1, '.');
+            var lb = new MarkPoint(p.X - 1, p.Y + 1, '.');
+            var l = new MarkPoint(p.X - 1, p.Y, '.');
 
-                if (!region.Contains(l) && !region.Contains(u))
-                {
-                    yield return new DPoint(p.X, p.Y);
-                }
-                if (region.Contains(l) && region.Contains(u) && !region.Contains(lu))
-                {
+            if (!region.Contains(l) && !region.Contains(u))
+            {
                 yield return new DPoint(p.X, p.Y);
-                }
-
-                if (!region.Contains(u) && !region.Contains(r))
-                {
-                yield return new DPoint(p.X + 1, p.Y);
-                }
-                if (region.Contains(u) && region.Contains(r) && !region.Contains(ru))
-                {
-                    yield return new DPoint(p.X + 1, p.Y);
-                }
-
-                if (!region.Contains(r) && !region.Contains(b))
-                {
-                    yield return new DPoint(p.X + 1, p.Y + 1);
-                }
-                if (region.Contains(r) && region.Contains(b) && !region.Contains(rb))
-                {
-                    yield return new DPoint(p.X + 1, p.Y + 1);
-                }
-
-                if (!region.Contains(b) && !region.Contains(l))
-                {
-                    yield return new DPoint(p.X, p.Y + 1);
-                }
-                if (region.Contains(b) && region.Contains(l) && !region.Contains(lb))
-                {
-                    yield return new DPoint(p.X, p.Y + 1);
-                }
             }
+            if (region.Contains(l) && region.Contains(u) && !region.Contains(lu))
+            {
+            yield return new DPoint(p.X, p.Y);
+            }
+
+            if (!region.Contains(u) && !region.Contains(r))
+            {
+            yield return new DPoint(p.X + 1, p.Y);
+            }
+            if (region.Contains(u) && region.Contains(r) && !region.Contains(ru))
+            {
+                yield return new DPoint(p.X + 1, p.Y);
+            }
+
+            if (!region.Contains(r) && !region.Contains(b))
+            {
+                yield return new DPoint(p.X + 1, p.Y + 1);
+            }
+            if (region.Contains(r) && region.Contains(b) && !region.Contains(rb))
+            {
+                yield return new DPoint(p.X + 1, p.Y + 1);
+            }
+
+            if (!region.Contains(b) && !region.Contains(l))
+            {
+                yield return new DPoint(p.X, p.Y + 1);
+            }
+            if (region.Contains(b) && region.Contains(l) && !region.Contains(lb))
+            {
+                yield return new DPoint(p.X, p.Y + 1);
+            }
+        }
     }
 
     protected static int TotalLengthOgEdges(List<char[]> map, IEnumerable<MarkPoint> region)
