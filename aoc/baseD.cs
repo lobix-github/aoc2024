@@ -3,10 +3,10 @@ using System.Numerics;
 
 abstract class baseD
 {
-    protected static Complex Up = -Complex.ImaginaryOne;
-    protected static Complex Down = Complex.ImaginaryOne;
-    protected static Complex Left = -1;
-	protected static Complex Right = 1;
+    protected static IntComplex Up = -IntComplex.ImaginaryOne;
+    protected static IntComplex Down = IntComplex.ImaginaryOne;
+    protected static IntComplex Left = -1;
+	protected static IntComplex Right = 1;
 
     protected int ToInt(string val) => Convert.ToInt32(val);
     protected int ToIntFromHex(string val) => Convert.ToInt32(val, 16);

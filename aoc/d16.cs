@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-class d16 : baseD
+﻿class d16 : baseD
 {
 	static Dictionary<infoD16, int> scores = [];
 	
@@ -10,15 +8,15 @@ class d16 : baseD
         var map = (
             from y in Enumerable.Range(0, lines.Length)
             from x in Enumerable.Range(0, lines[0].Length)
-            select new KeyValuePair<Complex, char>(x + y * Down, lines[y][x])
+            select new KeyValuePair<IntComplex, char>(x + y * Down, lines[y][x])
         ).ToDictionary();
 		var S = map.Keys.Single(k => map[k] == 'S');
 		var E = map.Keys.Single(k => map[k] == 'E');
 		var start = new infoD16(S, Right);
-		var q = new PriorityQueue<infoD16, double>();
+		var q = new PriorityQueue<infoD16, int>();
 		q.Enqueue(start, Math.Abs(S.Real - E.Real) + Math.Abs(S.Imaginary - E.Imaginary));
 		scores[start] = start.score;
-		HashSet<Complex> histories = [];
+		HashSet<IntComplex> histories = [];
 
 		var result = int.MaxValue;
 		while (q.Count > 0)
@@ -70,15 +68,15 @@ class d16 : baseD
 
 	class infoD16
 	{
-		public readonly Complex pos;
-		public readonly Complex dir;
-		public HashSet<Complex> visited = new(); 
+		public readonly IntComplex pos;
+		public readonly IntComplex dir;
+		public HashSet<IntComplex> visited = new(); 
 		public int score = 0;
 
 		private string id;
 		private int hashCode;
 
-		public infoD16(Complex pos, Complex dir)
+		public infoD16(IntComplex pos, IntComplex dir)
 		{
 			this.pos = pos;
 			this.dir = dir;
@@ -87,7 +85,7 @@ class d16 : baseD
 			hashCode = id.GetHashCode();
 		}
 
-		public infoD16 GetNext(Complex newDir)
+		public infoD16 GetNext(IntComplex newDir)
 		{
 			if (newDir == dir)
 			{
