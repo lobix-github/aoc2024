@@ -44,7 +44,13 @@ public readonly struct IntComplex
         m_imaginary = imaginary;
     }
 
-    public int Real { get { return m_real; } }
+	public IntComplex(IntComplex number)
+	{
+		m_real = number.m_real;
+		m_imaginary = number.m_imaginary;
+	}
+
+	public int Real { get { return m_real; } }
     public int Imaginary { get { return m_imaginary; } }
 
     public static IntComplex operator -(IntComplex value)  /* Unary negation of a complex number */

@@ -6,17 +6,20 @@
 		var PARAMS = (1024, 71);
 
 		var lines = File.ReadAllLines(@"..\..\..\inputs\18.txt");
-		var map = new Dictionary<IntComplex, (int, char)>();
+		var map = new HashSet<IntComplex>();
 		var idx = 0;
 		foreach (var line in lines)
 		{
 			var p = new IntComplex(line.Split(',')[0].ToInt32(), line.Split(',')[1].ToInt32());
-			map.Add(p, (idx, '#'));
+			map.Add(p);
 			idx++;
 			if (idx == PARAMS.Item1) break;
 		}
 
-		//print();
+		Enumerable.Range(-1, PARAMS.Item2 + 2).ToList().ForEach(x => map.Add(new IntComplex(-1, x)));
+		Enumerable.Range(-1, PARAMS.Item2 + 2).ToList().ForEach(x => map.Add(new IntComplex(PARAMS.Item2, x)));
+		Enumerable.Range(-1, PARAMS.Item2 + 2).ToList().ForEach(x => map.Add(new IntComplex(x, -1)));
+		Enumerable.Range(-1, PARAMS.Item2 + 2).ToList().ForEach(x => map.Add(new IntComplex(x, PARAMS.Item2)));
 
 		var S = new IntComplex(0, 0);
 		var E = new IntComplex(PARAMS.Item2 - 1, PARAMS.Item2 - 1);
@@ -24,6 +27,7 @@
 		var q = new PriorityQueue<infoD18, int>();
 		q.Enqueue(start, Math.Abs(S.Real - E.Real) + Math.Abs(S.Imaginary - E.Imaginary));
 		Dictionary<infoD18, int> visited = [];
+		HashSet<IntComplex> shortestPath = [];
 
 		var result = int.MaxValue;
 		while (q.Count > 0)
@@ -40,7 +44,11 @@
 
 			if (cur.pos == E)
 			{
-				result = Math.Min(result, cur.visited);
+				if (cur.visited < result)
+				{
+					result = cur.visited;
+					shortestPath = cur.hist;
+				}
 				continue;
 			}
 
@@ -57,24 +65,62 @@
 					q.Enqueue(next, prio);
 				}
 			}
-			bool isOK(infoD18 next) => next.visited < result && isInMap(next.pos) && !map.ContainsKey(next.pos);
-			bool isInMap(IntComplex p) => p.Imaginary >= 0 && p.Imaginary < PARAMS.Item2 && p.Real >= 0 && p.Real < PARAMS.Item2;
+			bool isOK(infoD18 next) => next.visited < result && !map.Contains(next.pos);
 		}
 
 		Console.WriteLine(result);
 
-		void print()
+		var c = 0;
+		foreach (var line in lines.Skip(idx))
 		{
-			for (int y = 0; y < PARAMS.Item2; y++)
+			Console.WriteLine($"{c++}/{lines.Length - idx}");
+			var p = new IntComplex(line.Split(',')[0].ToInt32(), line.Split(',')[1].ToInt32());
+			map.Add(p);
+
+			q = new PriorityQueue<infoD18, int>();
+			q.Enqueue(start, Math.Abs(S.Real - E.Real) + Math.Abs(S.Imaginary - E.Imaginary));
+			bool endReached = false;
+			result = int.MaxValue;
+			visited = [];
+			while (q.Count > 0)
 			{
-				for (int x = 0; x < PARAMS.Item2; x++)
+				var cur = q.Dequeue();
+				if (!visited.TryAdd(cur, cur.visited))
 				{
-					var p = new IntComplex(x, y);
-					Console.Write(map.ContainsKey(p) ? map[p].Item2 : '.');
+					if (cur.visited >= visited[cur])
+					{
+						continue;
+					}
 				}
-				Console.Write(Environment.NewLine);
+				visited[cur] = cur.visited;
+
+				if (cur.pos == E)
+				{
+					endReached = true;
+					break;
+				}
+
+				TryEnqueue(cur.GetNext(Left));
+				TryEnqueue(cur.GetNext(Right));
+				TryEnqueue(cur.GetNext(Up));
+				TryEnqueue(cur.GetNext(Down));
+
+				void TryEnqueue(infoD18 next)
+				{
+					if (isOK(next))
+					{
+						var prio = Math.Abs(next.pos.Real - E.Real) + Math.Abs(next.pos.Imaginary - E.Imaginary);
+						q.Enqueue(next, prio);
+					}
+				}
+				bool isOK(infoD18 next) => next.visited < result && !map.Contains(next.pos);
 			}
-			Console.Write(Environment.NewLine);
+
+			if (!endReached)
+			{
+				Console.WriteLine(p);
+				break;
+			}
 		}
 	}
 
@@ -85,6 +131,7 @@
 		private string id;
 		private int hashCode;
 		public int visited = 0;
+		public HashSet<IntComplex> hist = [];
 
 		public infoD18(IntComplex pos)
 		{
@@ -94,7 +141,12 @@
 			hashCode = id.GetHashCode();
 		}
 
-		public infoD18 GetNext(IntComplex newDir) => new infoD18(pos + newDir) { visited = visited + 1 };
+		public infoD18 GetNext(IntComplex newDir)
+		{
+			var h = hist.ToHashSet();
+			h.Add(pos + newDir);
+			return new infoD18(pos + newDir) { visited = visited + 1, hist = h };
+		}
 
 		public override int GetHashCode() => hashCode;
 
