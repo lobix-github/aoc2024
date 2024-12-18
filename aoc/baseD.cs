@@ -263,6 +263,14 @@ abstract class baseD
 
 		return indexes.ToArray();
 	}
+
+    protected void SurroundMapWithEdges(HashSet<IntComplex> map, int heiht, int wight)
+    {
+        Enumerable.Range(-1, heiht + 2).ToList().ForEach(x => map.Add(new IntComplex(-1, x)));
+        Enumerable.Range(-1, heiht + 2).ToList().ForEach(x => map.Add(new IntComplex(heiht, x)));
+        Enumerable.Range(-1, wight + 2).ToList().ForEach(x => map.Add(new IntComplex(x, -1)));
+        Enumerable.Range(-1, wight + 2).ToList().ForEach(x => map.Add(new IntComplex(x, wight)));
+    }
 }
 
 public class DCache<TKey, TValue>

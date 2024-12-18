@@ -16,11 +16,9 @@
 			if (idx == PARAMS.Item1) break;
 		}
 
-		Enumerable.Range(-1, PARAMS.Item2 + 2).ToList().ForEach(x => map.Add(new IntComplex(-1, x)));
-		Enumerable.Range(-1, PARAMS.Item2 + 2).ToList().ForEach(x => map.Add(new IntComplex(PARAMS.Item2, x)));
-		Enumerable.Range(-1, PARAMS.Item2 + 2).ToList().ForEach(x => map.Add(new IntComplex(x, -1)));
-		Enumerable.Range(-1, PARAMS.Item2 + 2).ToList().ForEach(x => map.Add(new IntComplex(x, PARAMS.Item2)));
+		SurroundMapWithEdges(map, PARAMS.Item2, PARAMS.Item2);
 
+		// find shortest path by flood fill
 		var S = new IntComplex(0, 0);
 		var E = new IntComplex(PARAMS.Item2 - 1, PARAMS.Item2 - 1);
 		var start = new infoD18(S);
