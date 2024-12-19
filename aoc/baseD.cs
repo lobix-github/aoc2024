@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Collections;
+using System.Drawing;
 using System.Numerics;
 
 abstract class baseD
@@ -271,6 +272,27 @@ abstract class baseD
         Enumerable.Range(-1, wight + 2).ToList().ForEach(x => map.Add(new IntComplex(x, -1)));
         Enumerable.Range(-1, wight + 2).ToList().ForEach(x => map.Add(new IntComplex(x, wight)));
     }
+
+	protected static IEnumerable<IList> Permutate(IList sequence, int count)
+	{
+		if (count == 1) yield return sequence;
+		else
+		{
+			for (int i = 0; i < count; i++)
+			{
+				foreach (var perm in Permutate(sequence, count - 1))
+					yield return perm;
+				RotateRight(sequence, count);
+			}
+		}
+	}
+
+	protected static void RotateRight(IList sequence, int count)
+	{
+		object tmp = sequence[count - 1];
+		sequence.RemoveAt(count - 1);
+		sequence.Insert(0, tmp);
+	}
 }
 
 public class DCache<TKey, TValue>
