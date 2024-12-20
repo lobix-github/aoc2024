@@ -265,9 +265,14 @@ abstract class baseD
 		return indexes.ToArray();
 	}
 
-    protected void SurroundMapWithEdges(HashSet<IntComplex> map, int minX, int maxX, int minY, int maxY)
+    protected void SurroundMapWithEdges(HashSet<IntComplex> map)
     {
-        Enumerable.Range(minY - 1, maxY - minY + 3).ToList().ForEach(x => map.Add(new IntComplex(minX - 1, x)));
+		var minX = map.Select(x => x.Real).Min();
+		var maxX = map.Select(x => x.Real).Max();
+		var minY = map.Select(x => x.Imaginary).Min();
+		var maxY = map.Select(x => x.Imaginary).Max();
+
+		Enumerable.Range(minY - 1, maxY - minY + 3).ToList().ForEach(x => map.Add(new IntComplex(minX - 1, x)));
         Enumerable.Range(minY - 1, maxY - minY + 3).ToList().ForEach(x => map.Add(new IntComplex(maxX + 1, x)));
         Enumerable.Range(minX - 1, maxX - minX + 3).ToList().ForEach(x => map.Add(new IntComplex(x, minY - 1)));
         Enumerable.Range(minX - 1, maxX - minX + 3).ToList().ForEach(x => map.Add(new IntComplex(x, maxY + 1)));

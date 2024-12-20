@@ -5,6 +5,8 @@
     public int predecessor;
     public int pathLength;
 
+    public Vertex(IntComplex vertex) : this(vertex.ToString()) { }
+	
     public Vertex(string name)
     {
         this.name = name;
@@ -24,7 +26,8 @@ class DijkstraGraph
     private readonly int TEMPORARY = 1;
     private readonly int PERMANENT = 2;
     private readonly int NIL = -1;
-    private readonly int INFINITY = 99999;
+    private readonly int INFINITY = int.MaxValue;
+    public HashSet<string> Vertexes = [];
 
     public DijkstraGraph()
     {
@@ -32,7 +35,14 @@ class DijkstraGraph
         vertexList = new Vertex[MAX_VERTICES];
     }
 
-    public int FindPaths(string source)
+    public bool ContainsVertex(IntComplex vertex) => Vertexes.Contains(vertex.ToString());
+
+	public IEnumerable<(string, int)> FindPaths(IntComplex source)
+	{
+        foreach (var path in FindPaths(source.ToString())) yield return path;
+	}
+	
+    public IEnumerable<(string, int)> FindPaths(string source)
     {
         int s = GetIndex(source);
 
@@ -42,18 +52,57 @@ class DijkstraGraph
         {
             if (vertexList[v].pathLength != INFINITY)
             {
-                if (vertexList[v].name.Contains("E"))
-                {
-                    return FindPath(s, v);
-                }
+                yield return (vertexList[v].name, FindPath(s, v).Item1);
             }
         }
-
-        return int.MaxValue;
     }
 
-    public void InsertVertex(string name) => vertexList[n++] = new Vertex(name);
+    public (int, HashSet<IntComplex>) FindPath(IntComplex source, IntComplex destination)
+    {
+        var result = FindPath(source.ToString(), destination.ToString());
+        return (result.Item1, result.Item2.Select(x => x.ToIntComplex()).ToHashSet());
+    }
 
+    public (int, HashSet<string>) FindPath(string source, string destination)
+	{
+		int s = GetIndex(source);
+
+		Dijkstra(s);
+
+		for (int v = 0; v < n; v++)
+		{
+			if (vertexList[v].pathLength != INFINITY)
+			{
+				if (vertexList[v].name.Equals(destination))
+				{
+					return FindPath(s, v);
+				}
+			}
+		}
+
+		return (INFINITY, null);
+	}
+
+	public IEnumerable<IntComplex> GetVisited()
+    {
+        foreach (var v in GetVisitedString()) yield return v.ToIntComplex();
+    }
+
+	public IEnumerable<string> GetVisitedString()
+    {
+        int i = 0;
+        while (vertexList[i] != null) yield return vertexList[i++].name;
+    }
+
+	public void InsertVertex(IntComplex vertex) => InsertVertex(vertex.ToString());
+
+	public void InsertVertex(string name) 
+    {
+        if (!Vertexes.Contains(name)) vertexList[n++] = new Vertex(name);
+    }
+
+	public void InsertEdge(IntComplex v1, IntComplex v2, int wt) => InsertEdge(v1.ToString(), v2.ToString(), wt);
+	
     public void InsertEdge(string s1, string s2, int wt)
     {
         int u = GetIndex(s1);
@@ -114,25 +163,27 @@ class DijkstraGraph
         return x;
     }
 
-    private int FindPath(int s, int v)
+    private (int, HashSet<string>) FindPath(int s, int v)
     {
         int u;
         int[] path = new int[n];
         int sd = 0;
         int count = 0;
+		HashSet<string> visited = [];
 
         while (v != s)
         {
             count++;
             path[count] = v;
             u = vertexList[v].predecessor;
-            sd += adj[u, v];
+            visited.Add(vertexList[v].name);
+			sd += adj[u, v];
             v = u;
         }
         count++;
         path[count] = s;
 
-        return sd;
+        return (sd, visited);
     }
 
     private int GetIndex(string s)

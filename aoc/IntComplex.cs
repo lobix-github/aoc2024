@@ -128,15 +128,11 @@ public readonly struct IntComplex
     {
         // $"<{m_real.ToString(format, provider)}; {m_imaginary.ToString(format, provider)}>";
         var handler = new DefaultInterpolatedStringHandler(4, 2, provider, stackalloc char[512]);
-        handler.AppendLiteral("x:");
+        handler.AppendLiteral("<");
         handler.AppendFormatted(m_real, format);
-        handler.AppendLiteral(", y:");
+        handler.AppendLiteral("; ");
         handler.AppendFormatted(m_imaginary, format);
-        //handler.AppendLiteral("; <");
-        //handler.AppendFormatted(m_real, format);
-        //handler.AppendLiteral("; ");
-        //handler.AppendFormatted(m_imaginary, format);
-        //handler.AppendLiteral(">");
+        handler.AppendLiteral(">");
         return handler.ToStringAndClear();
     }
 
@@ -205,12 +201,17 @@ public readonly struct IntComplex
         return new IntComplex(value, 0);
     }
 
-    public static implicit operator IntComplex(int value)
-    {
-        return new IntComplex(value, 0);
-    }
+	public static implicit operator IntComplex(int value)
+	{
+		return new IntComplex(value, 0);
+	}
 
-    public static implicit operator IntComplex(long value)
+	public static implicit operator IntComplex((int, int) value)
+	{
+		return new IntComplex(value.Item1, value.Item2);
+	}
+
+	public static implicit operator IntComplex(long value)
     {
         return new IntComplex((int)value, 0);
     }

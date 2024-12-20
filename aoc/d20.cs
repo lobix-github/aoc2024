@@ -74,9 +74,9 @@ class d20 : baseD
 		Console.WriteLine(result);
 
 		//print();
-		SurroundMapWithEdges(map, map.Select(x => x.Real).Min(), map.Select(x => x.Real).Max(), map.Select(x => x.Imaginary).Min(), map.Select(x => x.Real).Max());
-		SurroundMapWithEdges(map, map.Select(x => x.Real).Min(), map.Select(x => x.Real).Max(), map.Select(x => x.Imaginary).Min(), map.Select(x => x.Real).Max());
-		SurroundMapWithEdges(map, map.Select(x => x.Real).Min(), map.Select(x => x.Real).Max(), map.Select(x => x.Imaginary).Min(), map.Select(x => x.Real).Max());
+		SurroundMapWithEdges(map);
+		SurroundMapWithEdges(map);
+		SurroundMapWithEdges(map);
 		//print();
 		var candidates = new HashSet<(infoD20, infoD20)> ();
 		foreach (var p in shortestPath)

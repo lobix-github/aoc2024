@@ -16,7 +16,7 @@
 			if (idx == PARAMS.Item1) break;
 		}
 
-		SurroundMapWithEdges(map, 0, PARAMS.Item2, 0, PARAMS.Item2);
+		SurroundMapWithEdges(map);
 
 		// find shortest path by flood fill
 		var S = new IntComplex(0, 0);
