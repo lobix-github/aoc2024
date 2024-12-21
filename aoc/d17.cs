@@ -41,39 +41,37 @@ class d17
 		}
 
         ConcurrentBag<long> wins = new();
-        long count = 0;
-        Parallel.ForEach(maybes[0], (m0, state, id) =>
+        var count0 = 8;
+        var count1 = 8*8;
+        var pow10 = Math.Pow(8, 10);
+        var pow14 = Math.Pow(8, 14);
+		Parallel.ForEach(maybes[0], (m0, state, id0) =>
         //foreach (var m0 in maybes[0])
         {
-            Console.WriteLine($"0: {id}");
-            int im1 = 0;
-            foreach (var m1 in maybes[1])
-            {
-                Console.WriteLine($"1: {im1++}");
+			Parallel.ForEach(maybes[1], (m1, state, id1) =>
+			//foreach (var m1 in maybes[1])
+			{
                 int im2 = 0;
                 foreach (var m2 in maybes[2])
                 {
-                    Console.WriteLine($"2: {im2++}");
+                    im2++;
                     int im3 = 0;
                     foreach (var m3 in maybes[3])
                     {
-                        Console.WriteLine($"3: {im3++}");
+                        im3++;
                         int im4 = 0;
                         foreach (var m4 in maybes[4])
                         {
-                            Console.WriteLine($"4: {im4++}");
-                            int im5 = 0;
+							im4++;
+							int im5 = 0;
                             foreach (var m5 in maybes[5])
                             {
-                                Console.WriteLine($"5: {im5++}");
-                                int im6 = 0;
-                                foreach (var m6 in maybes[6])
+								im5++;
+                                Console.WriteLine($"{id0}/{id1}/{im2}/{im3}/{im4}/{im5} - jobs left: 0: {count0}, {count1}/64 ({(int)((im2 + 1) * (im3 + 1) * (im4 + 1) * (im5 + 1) * pow10 * 100 / pow14)}%), found: {wins.Count}");
+								foreach (var m6 in maybes[6])
                                 {
-                                    Console.WriteLine($"6: {im6++}");
-                                    int im7 = 0;
                                     foreach (var m7 in maybes[7])
                                     {
-                                        Console.WriteLine($"0/1/2/3/4/5/6/7: {id}/{im1}/{im2}/{im3}/{im4}/{im5}/{im6}/{im7++}");
                                         foreach (var m8 in maybes[8])
                                         {
                                             foreach (var m9 in maybes[9])
@@ -90,8 +88,6 @@ class d17
                                                                 {
                                                                     foreach (var m15 in maybes[15])
                                                                     {
-                                                                        count++;
-
                                                                         int i = 0;
                                                                         long a = m0 | m1 | m2 | m3 | m4 | m5 | m6 | m7 | m8 | m9 | m10 | m11 | m12 | m13 | m14 | m15;
                                                                         long b = 0;
@@ -119,7 +115,6 @@ class d17
                                                                                 var idx = getM(i - 1);
                                                                                 if (idx == -1) break;
                                                                                 var shift = shifts[i - 1][idx];
-                                                                                if (shift < 3) goto continue_m0;
                                                                                 if (shift < 6) goto continue_m1;
                                                                                 if (shift < 9) goto continue_m2;
                                                                                 if (shift < 12) goto continue_m3;
@@ -184,11 +179,13 @@ class d17
                     }
                     continue_m2:;
                 }
-                continue_m1:;
+                continue_m1:
+                Interlocked.Decrement(ref count1);
             }
-            continue_m0:;
-        }
-        );
+            );
+            Interlocked.Decrement(ref count0);
+		}
+		);
 
         //504094726375448 too high
         //Console.WriteLine(res);

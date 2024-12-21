@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Collections;
+using System.Drawing;
 using System.Numerics;
 
 abstract class baseD
@@ -262,6 +263,40 @@ abstract class baseD
 		}
 
 		return indexes.ToArray();
+	}
+
+    protected void SurroundMapWithEdges(HashSet<IntComplex> map)
+    {
+		var minX = map.Select(x => x.Real).Min();
+		var maxX = map.Select(x => x.Real).Max();
+		var minY = map.Select(x => x.Imaginary).Min();
+		var maxY = map.Select(x => x.Imaginary).Max();
+
+		Enumerable.Range(minY - 1, maxY - minY + 3).ToList().ForEach(x => map.Add(new IntComplex(minX - 1, x)));
+        Enumerable.Range(minY - 1, maxY - minY + 3).ToList().ForEach(x => map.Add(new IntComplex(maxX + 1, x)));
+        Enumerable.Range(minX - 1, maxX - minX + 3).ToList().ForEach(x => map.Add(new IntComplex(x, minY - 1)));
+        Enumerable.Range(minX - 1, maxX - minX + 3).ToList().ForEach(x => map.Add(new IntComplex(x, maxY + 1)));
+    }
+
+	protected static IEnumerable<IList> Permutate(IList sequence, int count)
+	{
+		if (count == 1) yield return sequence;
+		else
+		{
+			for (int i = 0; i < count; i++)
+			{
+				foreach (var perm in Permutate(sequence, count - 1))
+					yield return perm;
+				RotateRight(sequence, count);
+			}
+		}
+	}
+
+	protected static void RotateRight(IList sequence, int count)
+	{
+		object tmp = sequence[count - 1];
+		sequence.RemoveAt(count - 1);
+		sequence.Insert(0, tmp);
 	}
 }
 
