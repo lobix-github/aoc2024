@@ -1,6 +1,8 @@
 ﻿using System.Collections;
+using System.ComponentModel;
 using System.Drawing;
 using System.Numerics;
+using static System.Formats.Asn1.AsnWriter;
 
 abstract class baseD
 {
@@ -293,7 +295,138 @@ abstract class baseD
 		sequence.RemoveAt(count - 1);
 		sequence.Insert(0, tmp);
 	}
+
+    protected static HashSet<IntComplex> FindShortestPath(IntComplex start, IntComplex end, HashSet<IntComplex> map)
+    {
+		Dictionary<infoFindShortestPath, int> visited = [];
+        HashSet<IntComplex> shortestPath = [];
+        var q = new PriorityQueue<infoFindShortestPath, int>();
+        q.Enqueue(new infoFindShortestPath(start), Math.Abs(start.Real - end.Real) + Math.Abs(start.Imaginary - end.Imaginary));
+
+        var result = int.MaxValue;
+        while (q.Count > 0)
+        {
+            var cur = q.Dequeue();
+            if (!visited.TryAdd(cur, cur.visited))
+            {
+                if (cur.visited >= visited[cur])
+                {
+                    continue;
+                }
+            }
+            visited[cur] = cur.visited;
+
+            if (cur.pos == end)
+            {
+                if (cur.visited < result)
+                {
+                    result = cur.visited;
+                    shortestPath = cur.hist;
+                }
+                continue;
+            }
+
+            TryEnqueue(cur.GetNext(Left));
+            TryEnqueue(cur.GetNext(Right));
+            TryEnqueue(cur.GetNext(Up));
+            TryEnqueue(cur.GetNext(Down));
+
+            void TryEnqueue(infoFindShortestPath next)
+            {
+                if (next.visited < result && !map.Contains(next.pos))
+                {
+                    var prio = Math.Abs(next.pos.Real - end.Real) + Math.Abs(next.pos.Imaginary - end.Imaginary);
+                    q.Enqueue(next, prio);
+                }
+            }
+        }
+
+        return shortestPath;
+    }
+
+    static List<HashSet<IntComplex>> FindAllShortestPaths(IntComplex start, IntComplex end, HashSet<IntComplex> map)
+    {
+        Dictionary<infoFindShortestPath, int> visited = [];
+        List<HashSet<IntComplex>> shortestPaths = [];
+        var q = new PriorityQueue<infoFindShortestPath, int>();
+        q.Enqueue(new infoFindShortestPath(start), Math.Abs(start.Real - end.Real) + Math.Abs(start.Imaginary - end.Imaginary));
+
+        var result = int.MaxValue;
+        while (q.Count > 0)
+        {
+            var cur = q.Dequeue();
+            if (!visited.TryAdd(cur, cur.visited))
+            {
+                if (cur.visited > visited[cur])
+                {
+                    continue;
+                }
+            }
+            visited[cur] = cur.visited;
+
+            if (cur.pos == end)
+            {
+                if (cur.visited <= result)
+                {
+                    if (cur.visited <= result)
+                    {
+                        shortestPaths = [];
+                    }
+                    result = cur.visited;
+                    shortestPaths.Add(cur.hist);
+                }
+                continue;
+            }
+
+            TryEnqueue(cur.GetNext(Left));
+            TryEnqueue(cur.GetNext(Right));
+            TryEnqueue(cur.GetNext(Up));
+            TryEnqueue(cur.GetNext(Down));
+
+            void TryEnqueue(infoFindShortestPath next)
+            {
+                if (next.visited <= result && !map.Contains(next.pos))
+                {
+                    var prio = Math.Abs(next.pos.Real - end.Real) + Math.Abs(next.pos.Imaginary - end.Imaginary);
+                    q.Enqueue(next, prio);
+                }
+            }
+        }
+
+        return shortestPaths;
+    }
 }
+
+class infoFindShortestPath
+{
+    public readonly IntComplex pos;
+
+    private string id;
+    private int hashCode;
+    public int visited = 0;
+    public HashSet<IntComplex> hist = [];
+
+    public infoFindShortestPath(IntComplex pos)
+    {
+        this.pos = pos;
+
+        id = $"x: {(int)pos.Real}, y: {(int)pos.Imaginary}";
+        hashCode = id.GetHashCode();
+    }
+
+    public infoFindShortestPath GetNext(IntComplex newDir)
+    {
+        var h = hist.ToHashSet();
+        h.Add(pos + newDir);
+        return new infoFindShortestPath(pos + newDir) { visited = visited + 1, hist = h };
+    }
+
+    public override int GetHashCode() => hashCode;
+
+    public override bool Equals(object obj) => obj is infoFindShortestPath other && other.GetHashCode() == hashCode;
+
+    public override string ToString() => id;
+};
 
 public class DCache<TKey, TValue>
 {

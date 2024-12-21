@@ -27,46 +27,9 @@
 		Dictionary<infoD18, int> visited = [];
 		HashSet<IntComplex> shortestPath = [];
 
-		var result = int.MaxValue;
-		while (q.Count > 0)
-		{
-			var cur = q.Dequeue();
-			if (!visited.TryAdd(cur, cur.visited))
-			{
-				if (cur.visited >= visited[cur])
-				{
-					continue;
-				}
-			}
-			visited[cur] = cur.visited;
+		var result1 = FindShortestPath(S, E, map);
 
-			if (cur.pos == E)
-			{
-				if (cur.visited < result)
-				{
-					result = cur.visited;
-					shortestPath = cur.hist;
-				}
-				continue;
-			}
-
-			TryEnqueue(cur.GetNext(Left));
-			TryEnqueue(cur.GetNext(Right));
-			TryEnqueue(cur.GetNext(Up));
-			TryEnqueue(cur.GetNext(Down));
-
-			void TryEnqueue(infoD18 next)
-			{
-				if (isOK(next))
-				{
-					var prio = Math.Abs(next.pos.Real - E.Real) + Math.Abs(next.pos.Imaginary - E.Imaginary);
-					q.Enqueue(next, prio);
-				}
-			}
-			bool isOK(infoD18 next) => next.visited < result && !map.Contains(next.pos);
-		}
-
-		Console.WriteLine(result);
+		Console.WriteLine(result1.Count);
 
 		var c = 0;
 		foreach (var line in lines.Skip(idx))
@@ -78,7 +41,7 @@
 			q = new PriorityQueue<infoD18, int>();
 			q.Enqueue(start, Math.Abs(S.Real - E.Real) + Math.Abs(S.Imaginary - E.Imaginary));
 			bool endReached = false;
-			result = int.MaxValue;
+			int result = int.MaxValue;
 			visited = [];
 			while (q.Count > 0)
 			{
