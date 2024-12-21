@@ -267,12 +267,17 @@ abstract class baseD
 		return indexes.ToArray();
 	}
 
-    protected void SurroundMapWithEdges(HashSet<IntComplex> map, int heiht, int wight)
+    protected void SurroundMapWithEdges(HashSet<IntComplex> map)
     {
-        Enumerable.Range(-1, heiht + 2).ToList().ForEach(x => map.Add(new IntComplex(-1, x)));
-        Enumerable.Range(-1, heiht + 2).ToList().ForEach(x => map.Add(new IntComplex(heiht, x)));
-        Enumerable.Range(-1, wight + 2).ToList().ForEach(x => map.Add(new IntComplex(x, -1)));
-        Enumerable.Range(-1, wight + 2).ToList().ForEach(x => map.Add(new IntComplex(x, wight)));
+		var minX = map.Select(x => x.Real).Min();
+		var maxX = map.Select(x => x.Real).Max();
+		var minY = map.Select(x => x.Imaginary).Min();
+		var maxY = map.Select(x => x.Imaginary).Max();
+
+		Enumerable.Range(minY - 1, maxY - minY + 3).ToList().ForEach(x => map.Add(new IntComplex(minX - 1, x)));
+        Enumerable.Range(minY - 1, maxY - minY + 3).ToList().ForEach(x => map.Add(new IntComplex(maxX + 1, x)));
+        Enumerable.Range(minX - 1, maxX - minX + 3).ToList().ForEach(x => map.Add(new IntComplex(x, minY - 1)));
+        Enumerable.Range(minX - 1, maxX - minX + 3).ToList().ForEach(x => map.Add(new IntComplex(x, maxY + 1)));
     }
 
 	protected static IEnumerable<IList> Permutate(IList sequence, int count)
